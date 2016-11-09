@@ -1,0 +1,12 @@
+.wrapDiv{
+	width: 602px;
+	height: 602px;
+	margin:0 auto;
+
+}
+	#gameview{
+		width: 600px;
+		height: 600px;
+		border: 1px solid ;
+		background: rgb(249, 224, 213)
+	}
