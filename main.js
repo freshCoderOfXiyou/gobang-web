@@ -4,6 +4,7 @@
 	cav.width=600
 	cav.height=600
 	var ctx=cav.getContext('2d')
+
 	//define variable
 	const RADIUS=13.5
 	const INTERVAL=30
@@ -15,9 +16,55 @@
 	var blackPieces=[]
 	//define init color
 	color='black'
-	// var cavTop=cav.getBoundingClientRect().top
-	// var cavLeft=cav.getBoundingClientRect().left
-	// console.log(cavTop,cavLeft)
+	//define wins
+	var wins=[]
+	for(var i=0;i<19;i++){
+		wins[i]=[]
+		for(var j=0;j<19;j++){
+			wins[i][j]=[]
+		}
+	}
+	//define wins index:count
+	var count=0
+
+	//all horizontal line 
+	for(i=0;i<19;i++){
+		for(j=0;j<15;j++){
+			for(var k=0;k<5;k++){
+				wins[i][j+k][k]=1
+			}
+			count++
+		}
+	}
+	//all vertical line
+	for(i=0;i<15;i++){
+		for(j=0;j<19;j++){
+			for(var k=0;k<5;k++){
+				wins[i+k][j][k]=1
+			}
+			count++
+		}
+	}
+
+	//all slash line
+	for(i=0;i<15;i++){
+		for(j=0;j<15;j++){
+			for(var k=0;k<5;k++){
+				wins[i+k][j+k][k]=1
+			}
+			count++
+		}
+	}
+	for(i=0;i<15;i++){
+		for(j=18;j>3;j--){
+			for(var k=0;k<5;k++){
+				wins[i+k][j-k][k]=1
+			}
+			count++
+		}
+	}
+	console.log(wins)
+	// document.writeln(count)
 	/*
 	*draw the board
 	*/
@@ -70,7 +117,19 @@
 	/*draw pieces
 	*/
 	function drawPiece(posx,posy,color,r) {
-		ctx.fillStyle=color
+		//define gradient color 
+		var gradientColor=ctx.createRadialGradient(posx+2,posy-2,r*3/5,posx+2,posy-2,0)
+		if (color=='black') {
+			gradientColor.addColorStop(0,"#0a0a0a")
+			gradientColor.addColorStop(1,'#676367')
+		}else if (color=='white') {
+			gradientColor.addColorStop(0,'#d1d1d1')
+			gradientColor.addColorStop(1,'#fff')
+		}else{
+			var gradientColor=color
+		}
+		
+		ctx.fillStyle=gradientColor
 		ctx.beginPath()
 		ctx.arc(posx,posy,r,0,Math.PI*2)
 		ctx.fill()
