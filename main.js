@@ -265,7 +265,7 @@
 				}
 				//search the best point of black
 				if (max<blackScore[i][j]) {
-					max=blackScore
+					max=blackScore[i][j]
 					u=i
 					v=j
 				}
@@ -277,7 +277,7 @@
 				}
 				//search the best point of white
 				if (max<whiteScore[i][j]) {
-					max=whiteScore
+					max=whiteScore[i][j]
 					u=i
 					v=j
 				}
