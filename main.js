@@ -354,7 +354,10 @@
 		}
 		var computelocation=computeAI()
 		console.log(computelocation.locx,computelocation.locy)
-		oneStep(computelocation.locx,computelocation.locy)
+		if(!over){
+			oneStep(computelocation.locx,computelocation.locy)
+		}
+		
 	}, false)//end event listener
 
 	
