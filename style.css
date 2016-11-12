@@ -7,7 +7,7 @@
 	#gameview{
 		width: 600px;
 		height: 600px;
-		/* border: 1px solid #444; */
+		border: 1px solid #444;
 		background: rgb(249, 224, 213);
 		cursor: pointer;
 		box-shadow: 4px 6px 4px #777;

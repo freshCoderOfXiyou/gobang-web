@@ -16,6 +16,11 @@
 	var blackPieces=[]
 	//define init color
 	color='black'
+	//define chess board array
+	var chessBoard=[]
+	// for(var i=0;i<19;i++){
+
+	// }
 	//define wins
 	var wins=[]
 	for(var i=0;i<19;i++){
@@ -26,12 +31,24 @@
 	}
 	//define wins index:count
 	var count=0
-
+	//define array of who win
+	var blackWin=[]
+	var whiteWin=[]
+	//define game is over
+	var over=false
+	//define the chess board
+	var chessBoard=[]
+	for(i=0;i<19;i++){
+		chessBoard[i]=[]
+		for(j=0;j<19;j++){
+			chessBoard[i][j]=0
+		}
+	}
 	//all horizontal line 
 	for(i=0;i<19;i++){
 		for(j=0;j<15;j++){
 			for(var k=0;k<5;k++){
-				wins[i][j+k][k]=1
+				wins[i][j+k][count]=1
 			}
 			count++
 		}
@@ -40,7 +57,7 @@
 	for(i=0;i<15;i++){
 		for(j=0;j<19;j++){
 			for(var k=0;k<5;k++){
-				wins[i+k][j][k]=1
+				wins[i+k][j][count]=1
 			}
 			count++
 		}
@@ -50,7 +67,7 @@
 	for(i=0;i<15;i++){
 		for(j=0;j<15;j++){
 			for(var k=0;k<5;k++){
-				wins[i+k][j+k][k]=1
+				wins[i+k][j+k][count]=1
 			}
 			count++
 		}
@@ -58,13 +75,19 @@
 	for(i=0;i<15;i++){
 		for(j=18;j>3;j--){
 			for(var k=0;k<5;k++){
-				wins[i+k][j-k][k]=1
+				wins[i+k][j-k][count]=1
 			}
 			count++
 		}
 	}
-	console.log(wins)
+	// console.log(wins)
 	// document.writeln(count)
+
+	//initial who wins array
+	for(var i=0;i<count;i++){
+		 blackWin[i]=0
+		 whiteWin[i]=0
+	}
 	/*
 	*draw the board
 	*/
@@ -157,32 +180,7 @@
 	}
 
 
-	/*
-	*judge has win
-	*/
-	function hasWin(arr) {
-		var win=false
-		if(arr.length>4){
-			//sort the arr
-			arr.sort(function (cur,next) {
-				if (cur.piecesX<next.pieceX) {
-					return 0
-				}
-				else if(cur.pieceX==next.piecesX){
-					if (cur.pieceY<next.pieceY) {
-						return 0
-					}
-					else  {
-						return 1
-					}
-				}
-				else if (cur.pieceX>next.pieceX) {
-					return 1
-				}
-			})
-		}
-		return false
-	}
+
 		
 	/*
 	*function sort array
@@ -207,14 +205,101 @@
 		})
 	}
 
-	//add event listener
-	cav.addEventListener('click', function (e) {
+	/*
+	*function define computer ai
+	*/
+	function computeAI() {
+
+		//define the max score
+		var max=0
+		//define the max location
+		var u=0,v=0
 		
-		var x=Math.round((e.clientX-cavLeft-28)/INTERVAL)
-		var y=Math.round((e.clientY-cavTop-28)/INTERVAL)
-		console.log(x,y)
-		var had=hadPiece(x,y)
-		if(!had){
+		//initial blackScore array and whiteScore array
+		var blackScore=[]
+		var whiteScore=[]
+		for(var i=0;i<19;i++){
+			blackScore[i]=[]
+			whiteScore[i]=[]
+			for(var j=0;j<19;j++){
+				blackScore[i][j]=0
+				whiteScore[i][j]=0
+			}
+		}
+		//travercy every point of chess board
+		for(i=0;i<19;i++){
+			for(j=0;j<19;j++){
+				//if current position doesn't have piece
+				if (chessBoard[i][j]==0) {
+					for(var k=0;k<count;k++){
+						//if current position has wins
+						if (wins[i][j][k]) {
+							//fristly caculate black pieces
+							if (blackWin[k]==1) {
+								blackScore[i][j]+=200
+							}
+							else if (blackWin[k]==2) {
+								blackScore[i][j]+=400
+							}
+							else if(blackWin[k]==3){
+								blackScore[i][j]+=2000
+							}
+							else if(blackWin[k]==4){
+								blackScore[i][j]+=10000
+							}
+							//then caculate white piece 
+							if (whiteWin[k]==1) {
+								whiteScore[i][j]+=220
+							}
+							else if (whiteWin[k]==2) {
+								whiteScore[i][j]+=420
+							}
+							else if(whiteWin[k]==3){
+								whiteScore[i][j]+=2100
+							}
+							else if(whiteWin[k]==4){
+								whiteScore[i][j]+=40000
+							}
+						}
+					}
+				}
+				//search the best point of black
+				if (max<blackScore[i][j]) {
+					max=blackScore
+					u=i
+					v=j
+				}
+				else if (max==blackScore[i][j]) {
+					if (whiteScore[i][j]>whiteScore[u][v]) {
+						u=i
+						v=j
+					}
+				}
+				//search the best point of white
+				if (max<whiteScore[i][j]) {
+					max=whiteScore
+					u=i
+					v=j
+				}
+				else if (max==whiteScore[i][j]) {
+					if (blackScore[i][j]>blackScore[u][v]) {
+						u=i
+						v=j
+					}
+				}
+			}
+		}//end outer for 
+
+		console.log("function inner "+u,v)	
+		return {locx:u,locy:v}
+	}//end function computeAI
+
+	/*
+	*function one step
+	*@param: x , y
+	*@result:draw a piece at ( x , y )
+	*/
+	function oneStep(x,y){
 			drawPiece(x*INTERVAL+29,y*INTERVAL+28,color,RADIUS)
 			var singlePiece={
 				pieceX:x,
@@ -222,17 +307,54 @@
 			}
 			if (color=='black') {
 				color='white'
+				//'1' mean black piece
+				chessBoard[x][y]=1
 				blackPieces.push(singlePiece)
-				sortPieces(blackPieces)
-				console.log(blackPieces)
-			}else{
+				for(var k=0;k<count;k++){
+					if (wins[x][y][k]) {
+						blackWin[k]++
+						console.log("one step score"+blackWin[k])
+						if (blackWin[k]==5) {
+							setTimeout(function(){alert('black win')},1)
+							over=true
+							break
+						}
+					}
+				}
+
+			}else{	
 				color='black'
+				//'2' mean white piece
+				chessBoard[x][y]=2
 				whitePieces.push(singlePiece)
-				sortPieces(whitePieces)
+				for(var k=0;k<count;k++){
+					if (wins[x][y][k]) {
+						whiteWin[k]++
+						if(whiteWin[k]==5){
+							setTimeout(function(){alert('white win')},1)
+							over=true
+							break
+						}
+					}
+				}
 			}
-			
+	}
+
+	//add event listener
+	cav.addEventListener('click', function (e) {
+		if (over) {
+			return
 		}
 		
+		var x=Math.round((e.clientX-cavLeft-28)/INTERVAL)
+		var y=Math.round((e.clientY-cavTop-28)/INTERVAL)
+		var had=hadPiece(x,y)
+		if(!had){
+			oneStep(x,y)
+		}
+		var computelocation=computeAI()
+		console.log(computelocation.locx,computelocation.locy)
+		oneStep(computelocation.locx,computelocation.locy)
 	}, false)//end event listener
 
 	
